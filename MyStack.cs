@@ -1,6 +1,7 @@
-﻿namespace StackProject
+﻿using System.Collections;
+namespace StackProject
 {
-    public class MyStack<T>
+    public class MyStack<T> : IEnumerable<T>
     {
             private T[] _stack;
             public int Elements { get; private set; }
@@ -36,7 +37,7 @@
                 {
                     throw new InvalidOperationException();
                 }
-                _stack[--Elements] = default(T); // the same as null
+                _stack[--Elements] = default(T);
             }
             public object Peek()
             {
@@ -45,6 +46,46 @@
                     throw new InvalidOperationException();
                 }
                 return _stack[Elements - 1]; // not decrement
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return new StackEnum<T>(_stack, Elements);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public class StackEnum<T> : IEnumerator<T>
+        {
+            private readonly T[] array;
+            private readonly int count;
+            private int position;
+            public StackEnum(T[] array, int counter)
+            {
+                this.array = array;
+                position = counter;
+                count = counter;
+            }
+            public T Current => array[position];
+            object IEnumerator.Current => Current;
+
+            public void Dispose()
+            {
+            }
+
+            public bool MoveNext()
+            {
+                position--;
+                return position >= 0;
+            }
+
+            public void Reset()
+            {
+                position = count;
+            }
         }
     }
 }
